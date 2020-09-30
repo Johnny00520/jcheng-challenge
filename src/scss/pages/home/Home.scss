@@ -1,0 +1,32 @@
+
+.homepage_wrapper {
+	background-color: #FFFDEE;
+	height: 100%;
+	width: 90%;
+	margin: auto;
+
+	.title_wrapper {
+		padding: 5px;
+
+		header.title {
+			text-align: center;
+			color: #d54d7b;
+			font-family: "Great Vibes", cursive;
+			font-size: 2.8em;
+			font-weight: normal;
+			text-align: center;
+			text-shadow: 0 1px 1px #fff;
+			margin-bottom: 0;
+		}
+	}
+
+	.homepage_body {
+		margin: auto;
+
+		.fxn_options {
+			display: flex;
+
+			
+		}
+	}
+}

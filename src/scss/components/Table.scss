@@ -1,0 +1,14 @@
+
+.table_wrapper {
+	// width: 100%;
+	// max-height: calc(100vh - 200px);
+	// overflow: auto;
+
+	table {
+		width: 100%;
+	}
+	table, th, td {
+		border: 1px solid black;
+	}
+
+}

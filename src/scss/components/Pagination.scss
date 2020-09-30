@@ -1,0 +1,17 @@
+
+ul.pagination {
+	display: flex;
+	justify-content: center;
+	list-style-type: none;
+	li {
+		button.disabled,
+		button[disabled]{
+			background-color: #cccccc;
+			color: #666666;
+		}
+		
+	}
+	button.active {
+		background-color: aqua;
+	}
+}
