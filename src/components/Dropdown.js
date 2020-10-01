@@ -1,15 +1,15 @@
 import React from 'react';
 
-const Dropdown = () => {
+const Dropdown = ({
+	label,
+	values,
+	sortByChoice,
+}) => {
 	return (
 		<div>
-			<label for="cars">Choose a car:</label>
-
-				<select name="cars" id="cars">
-				<option value="volvo">Volvo</option>
-				<option value="saab">Saab</option>
-				<option value="mercedes">Mercedes</option>
-				<option value="audi">Audi</option>
+			<label>{label}</label>
+			<select onChange={sortByChoice}>
+				{values.map((value, index) => <option key={index} value={value}>{value}</option>)}
 			</select>
 		</div>
 	)
