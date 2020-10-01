@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HorizontalLine from "../../components/HorizontalLine";
 import SearchBar from "../../components/SearchBar";
 import Table from "../../components/Table";
-import Selection from "../../components/Selection";
+// import Selection from "../../components/Selection";
 import Spacer from "../../components/Spacer";
 import NoResult from "../../components/NoResult";
+// import Dropdown from "../../components/Dropdown";
+import Optgroup from "../../components/Optgroup";
 import Pagination from "../../components/Pagination";
 
 const Home = ({
@@ -12,83 +14,98 @@ const Home = ({
 }) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+	// const [direction, setDirection] = useState("");
 	// const [pageOfItems, setPageOfItems] = useState([]);
 	const [tableControl, setTableControl] = useState({
 		rowsPerPage: 10,
 		page: 0,		
 	})
 
-
-	const [filter, setFilter] = useState({
-		show: false,
-		filterKey: "",
-	})
-	const [filterTerm, setFilterTerm] = useState({
-		from: "",
-		to: "",
-	});
-	
-
-	React.useEffect(() => {
-		setSearchResults(data)
-
-		const results = data.filter(d => {
-			return (
-				d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				d.genre.toLowerCase().includes(searchTerm.toLowerCase())
-			)
-		});
-		setSearchResults(results);
-	}, [searchTerm, data]);
-
-	const sortByClick = (sortTitle) => {
-
-	}
-
-	const onFilterChange = e => {
+	const sortByChoice = (e) => {
+		let selectElem = document.getElementById("choiceLabel");
+		let optLabel = selectElem.options[selectElem.selectedIndex].parentNode.label;
 		const { value } = e.target;
-		if(value === "state" || value === "genre") {
-			setFilter({ filterKey: value, show: true });
-		} else {
-			setFilter({ filterKey: "all", show: false });
-		}
-	}
-	const onFilterInputFromChange = e => setFilterTerm({ ...filterTerm, from: e.target.value });
-	const onFilterInputToChange = e => setFilterTerm({ ...filterTerm,  to: e.target.value });
-	
-	const onFilterSubmit = (e) => {
-		e.preventDefault();
-		console.log("filterTerm: ", filterTerm)
-		const { from, to } = filterTerm;
-		console.log("filter: ", filter)
-		if(filter.filterKey === "state") {
-			const dataFiltered = searchResults.filter(data => {
-				if(from > data.state.toLowerCase() && to < data.state.toLowerCase()) {
+
+		switch(optLabel) {
+			case "state":
+				if(value === "ascending") {
+					let localData = data.sort((a, b) => (a.state > b.state) ? 1 : -1);
+					console.log("localData: ", localData)
+					return setSearchResults(localData)
+
+					// return setSearchResults(prevState => {
+					// 	console.log("prevState: ", prevState)
+					// 	return localData
+					// });
+				} else {
+					let localData = data.sort((a, b) => (b.state < a.state) ? -1 : 1);
+					return setSearchResults(prevState => [...prevState, localData]);
 
 				}
-			})
+			case "genre":
+				if(value === "ascending") {
+					let localData = data.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
+					return setSearchResults(localData);
+				} else {
+					let localData = data.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
+					return setSearchResults(prevState => [...prevState, localData]);	
+				}
 
-			console.log("dataFiltered: ", dataFiltered)
-		} else {
-
+			default:
+				let localData = data.sort((a, b) => (a.name > b.name) ? 1 : -1);
+				return setSearchResults(prevState => [...prevState, localData]);
 		}
 	}
 
-	const onHandleSearchChange = e => {
-		setSearchTerm(e.target.value);
+// ////////////////////////////////////////////////////////////////////////////////////
+
+	useEffect(() => {
+		setSearchResults(data)
+
+		// const results = data.filter(d => {
+		// 	return (
+		// 		d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+		// 		d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+		// 		d.genre.toLowerCase().includes(searchTerm.toLowerCase())
+		// 	)
+		// });
+		// setSearchResults(results);
+	}, [searchTerm, data]);
+
+	const onHandleSearchChange = e => setSearchTerm(e.target.value);
+	const onClearSearch = () => setSearchTerm("");
+	const keyDown = e => {
+		if(e.keyCode === 13) {
+			e.preventDefault();
+			const results = data.filter(d => {
+				return (
+					d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||	
+					d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+					d.genre.toLowerCase().includes(searchTerm.toLowerCase())
+				)
+			})
+			setSearchResults(results);
+		}
 	}
 	const onSearchSubmit = (e) => {
 		e.preventDefault();
+		const results = data.filter(d => {
+			return (
+				d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||	
+				d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				d.genre.toLowerCase().includes(searchTerm.toLowerCase())
+			)
+		})
+		setSearchResults(results);
 	}
-	const onClearSearch = () => setSearchTerm("");
+	
 
 	const onChangePage = (pageOfItems) => {
 		console.log("pageOfItems: ", pageOfItems)
         // update state with new page of items
         // setPageOfItems({ pageOfItems: pageOfItems });
         setSearchResults({ searchResults: pageOfItems });
-    }
+	}
 
 	return (
 		<div className="homepage_wrapper">
@@ -101,44 +118,39 @@ const Home = ({
 
 			<div className="homepage_body">
 				<div className="fxn_options">
-					<Selection
-						options={["all", "state", "genre"]}
-						onFilterChange={onFilterChange}
-					/>
-					{filter.show && 
-						<span>
-							<input
-								type="text"
-								placeholder="From..."
-								onChange={onFilterInputFromChange}
-							/>
-							<input
-								type="text"
-								placeholder="To..."
-								onChange={onFilterInputToChange}
-							/>
-							<button
-								onClick={onFilterSubmit}
-							>Filter</button>
-						</span>
-					}
-					<button
-						onClick={sortByClick("state")}
-					>Sort</button>
-					
 
+					<Optgroup
+						label="Sort By"
+						sortByChoice={sortByChoice}
+						optionValues={[
+							{
+								label: "all",
+								choices: ["all"]
+							},
+							{
+								label: "state",
+								choices: ["ascending", "descending"]
+							},
+							{
+								label: "genre",
+								choices: ["ascending", "descending"]
+							},
+						]}
+					/>
+					
 					<Spacer />
 
 					<SearchBar
 						searchTerm={searchTerm}
+						type={"text"}
+						placeholder={"Search keyword..."}
 						onHandleSearchChange={onHandleSearchChange}
+
+						keyDown={keyDown}
+						onSearchSubmit={onSearchSubmit}
 					/>
-					<button
-						onClick={onSearchSubmit}
-					>Search</button>
-					<button
-						onClick={onClearSearch}
-					>Clear</button>
+					<button onClick={onSearchSubmit}>Search</button>
+					<button onClick={onClearSearch}>Clear</button>
 				</div>
 
 				{searchResults.length !== 0 ?
