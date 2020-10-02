@@ -187,14 +187,6 @@ const Home = ({ data }) => {
 								onChangePage={onChangePage}
 							/>
 						}
-
-						{/* <Pagination
-							items={searchResults}
-							// items={pageOfItems}
-
-							initialPage={1}
-							onChangePage={onChangePage}
-						/> */}
 					</>
 				: <NoResult text="No Result Were Found"/>}
 			</div>
