@@ -5,9 +5,7 @@ const SearchBar = ({
 	searchTerm,
 	type,
 	placeholder,
-
 	onHandleSearchChange,
-	onSearchSubmit,
 	keyDown,
 }) => {	
 
@@ -18,10 +16,6 @@ const SearchBar = ({
 					type={type}
 					placeholder={placeholder}
 					value={searchTerm}
-
-					// onChange={React.useCallback(onHandleSearchChange)}
-					// onKeyDown={React.useCallback(onSearchSubmit)}
-
 					onChange={onHandleSearchChange}
 					onKeyDown={keyDown}
 				/>

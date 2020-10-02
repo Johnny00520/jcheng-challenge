@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-// import PropTypes from "prop-types";
-
+import PropTypes from "prop-types";
 
 class Pagination extends Component {
 	constructor(props) {
@@ -13,61 +12,64 @@ class Pagination extends Component {
 		this.setPage(this.props.initialPage);
 	}
 	setPage(page) {
-		console.log("page in pagination: ", page)
 		const {
 			items,
-			// rowsPerPage,
-			// page,
 			onChangePage,
 		} = this.props;
 
-		var pager = this.state.pager;
+		let pager = this.state.pager;
 
 		if(page < 1 || page > pager.totalPages) return;
 
 		pager = this.getPager(items.length, page);
+		// console.log("pager: ", pager)
 
-		console.log("pager: ", pager)
 		var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
-		console.log("pageOfItems: ", pageOfItems)
+		// console.log("pageOfItems in pagination: ", pageOfItems)
 		this.setState({ pager: pager });
 
-		// this.props.onChangePage(pageOfItems);
+		// debugger
 
-		// onChangePage(page)
-
-		
+		onChangePage(pageOfItems)
 	}
 
 	getPager(totalItems, currentPage, pageSize) {
 		currentPage = currentPage || 1;
 
 		// default page size is 3
-		pageSize = pageSize || 3;
+		pageSize = pageSize || 10;
 		
+		// calculate total pages
 		let totalPages = Math.ceil(totalItems / pageSize);
-		console.log("totalPages: ", totalPages)
-		console.log("currentPage: ", currentPage)
-		console.log("pageSize: ", pageSize)
-		if(totalPages <= 10) {
-			var startPage = 1;
-			var endPage = totalPages;
+		// console.log("totalPages: ", totalPages)
+		// console.log("currentPage: ", currentPage)
+		// console.log("pageSize: ", pageSize)
+
+		var startPage;
+		var endPage;
+		if(totalPages <= 3) {
+			startPage = 1;
+			endPage = totalPages - 1;
 		} else {
+			// more than 10 total pages so calculate start and end pages
 			if(currentPage <= 3) {
 				startPage = 1;
 				endPage = 3;
-			} else if (currentPage + 4 >= totalPages) {
-                startPage = totalPages - 1;
-                endPage = totalPages;
+			} else if (currentPage + 1 >= totalPages) {
+                startPage = totalPages - 2;
+				endPage = totalPages;
             } else {
-                startPage = currentPage - 2;
-                endPage = currentPage;
+				console.log("there")
+                // startPage = currentPage - 2;
+				// endPage = currentPage;
             }
 		}
 		// calculate start and end item indexes
         var startIndex = (currentPage - 1) * pageSize;
-		var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
-		
+		var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1); // min(9, 37)
+		// console.log("startIndex: ", startIndex)
+		// console.log("endIndex: ", endIndex)
+		// create an array of pages to ng-repeat in the pager control
 		var pages = [...Array((endPage + 1) - startPage).keys()].map(i => startPage + i);
 		return {
             totalItems: totalItems,
@@ -128,10 +130,10 @@ class Pagination extends Component {
 	}
 }
 
-// Pagination.propTypes = {
-// 	items: PropTypes.array.isRequired,
-//     onChangePage: PropTypes.func.isRequired,
-//     initialPage: PropTypes.number,
-//     pageSize: PropTypes.number
-// };
+Pagination.propTypes = {
+	items: PropTypes.array.isRequired,
+    onChangePage: PropTypes.func.isRequired,
+    initialPage: PropTypes.number,
+    pageSize: PropTypes.number
+};
 export default Pagination;
