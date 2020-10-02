@@ -10,11 +10,10 @@ import Checkbox from "../../components/Checkbox";
 
 const Home = ({ data }) => {
 	const [searchTerm, setSearchTerm] = useState("");
+	const [showFilter, setShowFilter] = useState(false);
 	const [searchResults, setSearchResults] = useState([]);
-
 	const [pageOfItems, setPageOfItems] = useState([]);
-	const [showSort, setShowSort] = useState(false);
-
+	const [searchPress, setSearchPress] = useState(false);
 
 	const sortByChoice = (e) => {
 		let selectElem = document.getElementById("choiceLabel");
@@ -24,36 +23,53 @@ const Home = ({ data }) => {
 		switch(optLabel) {
 			case "state":
 				if(value === "ascending") {
-					console.log("pageOfItems: ", pageOfItems)
-					let localData = pageOfItems.sort((a, b) => (a.state > b.state) ? 1 : -1);
-					return setSearchResults(prevState => [...prevState, localData]);
-
-
-					// return setSearchResults(prevState => {
-					// 	console.log("prevState: ", prevState)
-					// 	return localData
-					// });
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (a.state > b.state) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (a.state > b.state) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
 				} else {
-					let localData = pageOfItems.sort((a, b) => (b.state < a.state) ? -1 : 1);
-					return setSearchResults(prevState => [...prevState, localData]);
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (b.state < a.state) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (b.state < a.state) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
 
 				}
 			case "genre":
 				if(value === "ascending") {
-					let localData = pageOfItems.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
-					return setSearchResults(prevState => [...prevState, localData]);
+					if(searchPress){
+						let localData = pageOfItems.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
 				} else {
-					let localData = pageOfItems.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
-					return setSearchResults(prevState => [...prevState, localData]);	
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);	
+					} else {
+						let localData = searchResults.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
 				}
 
 			default:
-				let localData = pageOfItems.sort((a, b) => (a.name > b.name) ? 1 : -1);
-				return setSearchResults(prevState => [...prevState, localData]);
+				if(searchPress) {
+					let localData = pageOfItems.sort((a, b) => (a.name > b.name) ? 1 : -1);
+					return setSearchResults(prevState => [...prevState, localData]);
+				} else {
+					let localData = searchResults.sort((a, b) => (a.name > b.name) ? 1 : -1);
+					return setSearchResults(prevState => [...prevState, localData]);
+				}
 		}
 	}
 
-// ////////////////////////////////////////////////////////////////////////////////////
 	useEffect(() => {
 		setSearchResults(data)
 
@@ -64,13 +80,15 @@ const Home = ({ data }) => {
 		// 		d.genre.toLowerCase().includes(searchTerm.toLowerCase())
 		// 	)
 		// });
-		// setSearchResults(results);
-	// }, [searchTerm, data]);
+		// return setSearchResults(results);
 	}, [searchTerm, data]);
 
-	const handleCheckBoxChange = () => setShowSort((prevState) => !prevState);
+	const handleCheckBoxChange = () => setShowFilter((prevState) => !prevState);
 	const onHandleSearchChange = e => setSearchTerm(e.target.value);
-	const onClearSearch = () => setSearchTerm("");
+	const onClearSearch = () => {
+		setSearchTerm("");
+		setSearchPress(false);
+	}
 	const keyDown = e => {
 		if(e.keyCode === 13) {
 			e.preventDefault();
@@ -81,8 +99,10 @@ const Home = ({ data }) => {
 					d.genre.toLowerCase().includes(searchTerm.toLowerCase())
 				)
 			})
-			setPageOfItems(results)
+			setSearchResults(results);
+			setSearchPress(true);
 		}
+
 	}
 	const onSearchSubmit = (e) => {
 		e.preventDefault();
@@ -92,14 +112,12 @@ const Home = ({ data }) => {
 			d.genre.toLowerCase().includes(searchTerm.toLowerCase())
 		))
 		setSearchResults(results);
+		setSearchPress(true);
 	}
 
-	
-	
-
 	const onChangePage = (pageOfItems) => {
-		console.log("pageOfItems in Home: ", pageOfItems)
 		setPageOfItems(pageOfItems)
+		// setSearchResults(pageOfItems);
 	}
 
 	return (
@@ -110,14 +128,13 @@ const Home = ({ data }) => {
 			<HorizontalLine color={"red"}/>
 
 			<div className="homepage_body">
-
 				<div className="fxn_options">
 					<Checkbox
 						label={"Show filter"}
-						checked={showSort}
+						checked={showFilter}
 						handleCheckBoxChange={handleCheckBoxChange}
 					/>
-					{showSort &&
+					{showFilter &&
 						<div className="togglebox">
 							<Optgroup
 								label="Sort By"
@@ -141,7 +158,6 @@ const Home = ({ data }) => {
 					}
 
 					<Spacer />
-
 					<div className="search_box">
 						<SearchBar
 							searchTerm={searchTerm}
@@ -160,18 +176,25 @@ const Home = ({ data }) => {
 				{searchResults.length !== 0 ?
 					<>
 						<Table
-							// data={searchResults}
-							data={pageOfItems}
-							
 							titleRow={["name", "city", "state", "telephone", "genre"]}
+							data={searchPress ? pageOfItems : searchResults}
 						/>
-						<Pagination
+
+						{ searchPress &&
+							<Pagination
+								items={searchResults}
+								initialPage={1}
+								onChangePage={onChangePage}
+							/>
+						}
+
+						{/* <Pagination
 							items={searchResults}
 							// items={pageOfItems}
 
 							initialPage={1}
 							onChangePage={onChangePage}
-						/>
+						/> */}
 					</>
 				: <NoResult text="No Result Were Found"/>}
 			</div>

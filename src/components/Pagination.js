@@ -18,40 +18,31 @@ class Pagination extends Component {
 		} = this.props;
 
 		let pager = this.state.pager;
-
 		if(page < 1 || page > pager.totalPages) return;
 
 		pager = this.getPager(items.length, page);
 		// console.log("pager: ", pager)
 
 		var pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
-		// console.log("pageOfItems in pagination: ", pageOfItems)
 		this.setState({ pager: pager });
-
-		// debugger
-
-		onChangePage(pageOfItems)
+		onChangePage(pageOfItems);
 	}
 
 	getPager(totalItems, currentPage, pageSize) {
 		currentPage = currentPage || 1;
 
-		// default page size is 3
+		// default page size is 10
 		pageSize = pageSize || 10;
 		
 		// calculate total pages
 		let totalPages = Math.ceil(totalItems / pageSize);
-		// console.log("totalPages: ", totalPages)
-		// console.log("currentPage: ", currentPage)
-		// console.log("pageSize: ", pageSize)
-
-		var startPage;
-		var endPage;
-		if(totalPages <= 3) {
+		let startPage;
+		let endPage;
+		if(totalPages <= 2) {
 			startPage = 1;
-			endPage = totalPages - 1;
+			endPage = totalPages;
 		} else {
-			// more than 10 total pages so calculate start and end pages
+			// more than 3 total pages so calculate start and end pages
 			if(currentPage <= 3) {
 				startPage = 1;
 				endPage = 3;
@@ -59,7 +50,6 @@ class Pagination extends Component {
                 startPage = totalPages - 2;
 				endPage = totalPages;
             } else {
-				console.log("there")
                 // startPage = currentPage - 2;
 				// endPage = currentPage;
             }
@@ -67,8 +57,6 @@ class Pagination extends Component {
 		// calculate start and end item indexes
         var startIndex = (currentPage - 1) * pageSize;
 		var endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1); // min(9, 37)
-		// console.log("startIndex: ", startIndex)
-		// console.log("endIndex: ", endIndex)
 		// create an array of pages to ng-repeat in the pager control
 		var pages = [...Array((endPage + 1) - startPage).keys()].map(i => startPage + i);
 		return {
@@ -92,7 +80,6 @@ class Pagination extends Component {
         }
 		return (
 			<ul className="pagination">
-
                 <li>
                     <button
 						className={pager.currentPage === 1 ? 'disabled' : ''}

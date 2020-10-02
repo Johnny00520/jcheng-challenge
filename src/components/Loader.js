@@ -7,7 +7,6 @@ const override = css`
 	margin: 0 auto;
 	padding-top: 50px;
 	background-color: "lightgrey";
-
 `;
 
 const Loader = ({ loading }) => {
