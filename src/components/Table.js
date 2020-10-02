@@ -4,10 +4,8 @@ const Table = ({
 	data,
 	// keyFilter,
 	titleRow,
-
-	rowsPerPage,
-	page,
 }) => {
+	// console.log("data: ", data)
 	return (
 		<div className="table_wrapper">
 			<table>
@@ -26,6 +24,7 @@ const Table = ({
 							</tr>
 						)
 					})} */}
+
 					{data.map((item, index) => {
 						return (
 							<tr key={index}>

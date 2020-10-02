@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { handleResponse } from "../utils/http";
 
 import Home from "../pages/home/Home";
+import Loader from "../components/Loader";
 
 
 class App extends Component {
@@ -19,7 +20,6 @@ class App extends Component {
 		.then(handleResponse)
 		.then((dataFetched) => {
 			this.setState((prevState) => ({
-				// data: dataFetched,
 				data: dataFetched.sort((a, b) => (a.name > b.name) ? 1 : -1),
 				isLoading: !prevState.isLoading				
 			}))
@@ -28,12 +28,9 @@ class App extends Component {
 			this.setState({ error: error });
 		})
 	}
-
-
 	
 	render() {
-		// console.log("this.state: ", this.state)
-
+		if(this.state.isLoading ) return <Loader />
 		return (
 			<div className="app_wrapper">
 				<Home
