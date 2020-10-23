@@ -8,66 +8,71 @@ import Optgroup from "../../components/Optgroup";
 import Pagination from "../../components/Pagination";
 import Checkbox from "../../components/Checkbox";
 
-const sortByDirectionAndKey = (arr, column, direction) => {
-	if(direction === "ascending") {
-		return arr.sort((a, b) => (a[column].toUpperCase() > b[column].toUpperCase()) ? 1 : -1)
-	} else {
-		return arr.sort((a, b) => (a[column].toUpperCase() > b[column].toUpperCase()) ? -1 : 1)
-	}
-}
-
 const Home = ({ data }) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showFilter, setShowFilter] = useState(false);
+	const [searchResults, setSearchResults] = useState([]);
 	const [pageOfItems, setPageOfItems] = useState([]);
-	const [searchResults, setSearchResults] = useState({
-		data: [],
-		searchPress: false,
-	});
+	const [searchPress, setSearchPress] = useState(false);
 
 	const sortByChoice = (e) => {
 		let selectElem = document.getElementById("choiceLabel");
-		const optLabel = selectElem.options[selectElem.selectedIndex].parentNode.label;
+		let optLabel = selectElem.options[selectElem.selectedIndex].parentNode.label;
 		const { value } = e.target;
 
-		if(value === "all") {
-			return setSearchResults((prevState) => ({
-				...prevState,
-				data: sortByDirectionAndKey(searchResults.data, "name", "ascending"),
-			}))
-		}
+		switch(optLabel) {
+			case "state":
+				if(value === "ascending") {
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (a.state > b.state) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (a.state > b.state) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
+				} else {
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (b.state < a.state) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (b.state < a.state) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
 
-		if(searchResults.searchPress) {
-			return setSearchResults((prevState) => {
-				return {
-					...prevState,
-					data: sortByDirectionAndKey(pageOfItems, optLabel, value),
 				}
-			})
-		}
+			case "genre":
+				if(value === "ascending") {
+					if(searchPress){
+						let localData = pageOfItems.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					} else {
+						let localData = searchResults.sort((a, b) => (a.genre > b.genre) ? 1 : -1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
+				} else {
+					if(searchPress) {
+						let localData = pageOfItems.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);	
+					} else {
+						let localData = searchResults.sort((a, b) => (b.genre < a.genre) ? -1 : 1);
+						return setSearchResults(prevState => [...prevState, localData]);
+					}
+				}
 
-		// if(searchResults.column === optLabel) {
-		// 	return setSearchResults((prevState) => {
-		// 		return {
-		// 			...prevState,
-		// 			data: prevState.data.reverse(),
-		// 			direction: prevState.direction === 'ascending' ? 'descending' : 'ascending',
-		// 		}
-		// 	})	
-		// }
-		return setSearchResults((prevState) => ({
-			...prevState,
-			data: sortByDirectionAndKey(searchResults.data, optLabel, value),
-		}))
+			default:
+				if(searchPress) {
+					let localData = pageOfItems.sort((a, b) => (a.name > b.name) ? 1 : -1);
+					return setSearchResults(prevState => [...prevState, localData]);
+				} else {
+					let localData = searchResults.sort((a, b) => (a.name > b.name) ? 1 : -1);
+					return setSearchResults(prevState => [...prevState, localData]);
+				}
+		}
 	}
 
 	useEffect(() => {
-		setSearchResults((prevState) => ({
-			...prevState,
-			data
-		}))
-		
-		// setSearchResults(data)
+		setSearchResults(data)
+
 		// const results = data.filter(d => {
 		// 	return (
 		// 		d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,47 +87,37 @@ const Home = ({ data }) => {
 	const onHandleSearchChange = e => setSearchTerm(e.target.value);
 	const onClearSearch = () => {
 		setSearchTerm("");
-		setSearchResults((prevState) => {
-			return {
-				...prevState,
-				searchPress: false,
-			}
-		});
+		setSearchPress(false);
 	}
 	const keyDown = e => {
 		if(e.keyCode === 13) {
 			e.preventDefault();
-			const results = searchResults.data.filter(d => {
+			const results = searchResults.filter(d => {
 				return (
 					d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||	
 					d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
 					d.genre.toLowerCase().includes(searchTerm.toLowerCase())
 				)
 			})
-			setSearchResults((prevState) => ({
-				...prevState,
-				data: results,
-				searchPress: true
-			}));
+			setSearchResults(results);
+			setSearchPress(true);
 		}
 
 	}
 	const onSearchSubmit = (e) => {
 		e.preventDefault();
-		const results = searchResults.data.filter(d => (
+		const results = searchResults.filter(d => (
 			d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||	
 			d.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
 			d.genre.toLowerCase().includes(searchTerm.toLowerCase())
 		))
-		setSearchResults((prevState) => ({
-			...prevState,
-			data: results,
-			searchPress: true
-		}));
+		setSearchResults(results);
+		setSearchPress(true);
 	}
 
 	const onChangePage = (pageOfItems) => {
 		setPageOfItems(pageOfItems)
+		// setSearchResults(pageOfItems);
 	}
 
 	return (
@@ -178,16 +173,16 @@ const Home = ({ data }) => {
 				</div>
 				
 
-				{searchResults.data.length !== 0 ?
+				{searchResults.length !== 0 ?
 					<>
 						<Table
 							titleRow={["name", "city", "state", "telephone", "genre"]}
-							data={searchResults.searchPress ? pageOfItems : searchResults.data}
+							data={searchPress ? pageOfItems : searchResults}
 						/>
 
-						{ searchResults.searchPress &&
+						{ searchPress &&
 							<Pagination
-								items={searchResults.data}
+								items={searchResults}
 								initialPage={1}
 								onChangePage={onChangePage}
 							/>
@@ -200,4 +195,3 @@ const Home = ({ data }) => {
 }
 
 export default Home;
-

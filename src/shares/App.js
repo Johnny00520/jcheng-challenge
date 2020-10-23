@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { handleResponse } from "../utils/http";
 
 import Home from "../pages/home/Home";
+// import HomeOld from "../pages/home/HomeOld";
 import Loader from "../components/Loader";
 
 
@@ -33,6 +34,9 @@ class App extends Component {
 		if(this.state.isLoading ) return <Loader />
 		return (
 			<div className="app_wrapper">
+				{/* <HomeOld
+					data={this.state.data}
+				/> */}
 				<Home
 					data={this.state.data}
 				/>
