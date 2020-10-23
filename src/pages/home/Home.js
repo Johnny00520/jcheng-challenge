@@ -7,6 +7,7 @@ import NoResult from "../../components/NoResult";
 import Optgroup from "../../components/Optgroup";
 import Pagination from "../../components/Pagination";
 import Checkbox from "../../components/Checkbox";
+import Modal from "../../components/Modal";
 
 const sortByDirectionAndKey = (arr, column, direction) => {
 	if(direction === "ascending") {
@@ -20,6 +21,9 @@ const Home = ({ data }) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showFilter, setShowFilter] = useState(false);
 	const [pageOfItems, setPageOfItems] = useState([]);
+	const [modalToggle, setModalToggle] = useState(false);
+	const [modalTable, setModalTable] = useState([]);
+
 	const [searchResults, setSearchResults] = useState({
 		data: [],
 		searchPress: false,
@@ -125,6 +129,11 @@ const Home = ({ data }) => {
 		setPageOfItems(pageOfItems)
 	}
 
+	const onTableRowHandler = (item) => {
+		setModalToggle((prevState) => !prevState);
+		setModalTable((prevState) => [...prevState, item]);
+	}
+
 	return (
 		<div className="homepage_wrapper">
 			<div className="title_wrapper">
@@ -183,7 +192,19 @@ const Home = ({ data }) => {
 						<Table
 							titleRow={["name", "city", "state", "telephone", "genre"]}
 							data={searchResults.searchPress ? pageOfItems : searchResults.data}
+							onTableRowHandler={onTableRowHandler}
+							customClassName={"table_row"}
 						/>
+
+						<Modal show={modalToggle} onTableRowHandler={onTableRowHandler}>
+							<div style={{ color:'black' }}>
+								<Table
+									titleRow={["address1", "zip", "lat", "long", "tags", "website", "hours"]}
+									data={modalTable}
+								/>
+							</div>
+						</Modal>
+
 
 						{ searchResults.searchPress &&
 							<Pagination
